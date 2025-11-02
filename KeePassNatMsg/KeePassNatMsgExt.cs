@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace KeePassNatMsg
@@ -60,7 +59,7 @@ namespace KeePassNatMsg
         public const string AssociateKeyPrefix = "Public Key: ";
         private const string PipeName = "kpxc_server";
 
-        private static readonly Version KeePassXcVersion = new Version(2, 6, 6);
+        private static readonly Version KeePassXcVersion = new Version(2, 7, 10);
 
         private IListener _listener;
 
@@ -277,7 +276,8 @@ namespace KeePassNatMsg
         {
             var win = HostInstance.MainWindow;
             if (group == null) group = GetConnectionDatabase().RootGroup;
-            var f = (MethodInvoker) delegate {
+            var f = (MethodInvoker)delegate
+            {
                 win.UpdateUI(false, null, true, group, true, null, true);
             };
             if (win.InvokeRequired)

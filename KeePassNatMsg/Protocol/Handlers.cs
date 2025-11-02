@@ -40,6 +40,8 @@ namespace KeePassNatMsg.Protocol
                 {Actions.GET_DATABASE_GROUPS, GetDatabaseGroups},
                 {Actions.CREATE_NEW_GROUP, CreateNewGroup},
                 {Actions.GET_TOTP, GetTotp},
+                {Actions.PASSKEYS_GET, GetPasskey},
+                {Actions.PASSKEYS_REGISTER, RegisterPasskey},
             };
         }
 
@@ -238,7 +240,7 @@ namespace KeePassNatMsg.Protocol
         {
             var groups = new JArray();
 
-            foreach(var grp in group.GetGroups(false))
+            foreach (var grp in group.GetGroups(false))
             {
                 groups.Add(new JObject
                 {
@@ -289,6 +291,48 @@ namespace KeePassNatMsg.Protocol
             var resp = req.GetResponse();
 
             resp.Message.Add("totp", totp);
+
+            return resp;
+        }
+
+        private Response GetPasskey(Request req)
+        {
+            if (!req.TryDecrypt())
+                return new ErrorResponse(req, ErrorType.CannotDecryptMessage);
+
+            //https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions
+            var publicKeyCredentialRequestOptions = req.Message;
+
+
+            var resp = req.GetResponse();
+            //Respone message = PublicKeyCredential
+            //https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential
+            //https://github.com/keepassxreboot/keepassxc/blob/9814037fd3b28a267d194debf05d93461ca2b519/src/browser/BrowserPasskeys.cpp#L141
+            resp.Message.Add("authenticatorAttachment", "authenticatorAttachment");
+            resp.Message.Add("id", "id");
+            resp.Message.Add("response", "response");
+            resp.Message.Add("type", "type");
+
+            return resp;
+        }
+        private Response RegisterPasskey(Request req)
+        {
+            if (!req.TryDecrypt())
+                return new ErrorResponse(req, ErrorType.CannotDecryptMessage);
+
+            //https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions
+            var publicKeyCredentialRequestOptions = req.Message;
+
+
+            var resp = req.GetResponse();
+            //Respone message = PublicKeyCredential
+            //https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential 
+            //https://github.com/keepassxreboot/keepassxc/blob/9814037fd3b28a267d194debf05d93461ca2b519/src/browser/BrowserPasskeys.cpp#L110
+            //https://github.com/keepassxreboot/keepassxc/blob/9814037fd3b28a267d194debf05d93461ca2b519/src/browser/BrowserService.cpp#L677
+            resp.Message.Add("authenticatorAttachment", "authenticatorAttachment");
+            resp.Message.Add("id", "id");
+            resp.Message.Add("response", "response");
+            resp.Message.Add("type", "type");
 
             return resp;
         }
